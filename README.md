@@ -10,7 +10,13 @@ run themo.sh on all slaves.
 Open Houdini,
 copy contents of houdini scripts into respective shelf tools: 
 farmit, wedge1b1, wedge1b1L,
-select ROPs to render, hit the button for farmit on the shelf to farm the ROPS.
+select ROPs to render, hit the button for farmit on the shelf to farm the ROPS,
+it will: 
+ * save your hipfile!
+ * copy your hipfile with a jobID as its name (clean these up yourself if its annoying)
+ * rsync your $HFS to farm/hfs sos the slaves can run daily-builds too
+ * piece together commands to process your stuff
+ * create the commands in farm/pending
 
 For wedge1by1local, make a farm on the desktop.
 
