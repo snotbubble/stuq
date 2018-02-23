@@ -3,7 +3,7 @@ simple Q
 
 ```
 Make a dir called farm in the project dir - one level up from $HIP,
-add subdirs: pending, running and done,
+add subdirs: pending, running, done and hfs,
 copy themo.sh into it,
 run themo.sh.
 
