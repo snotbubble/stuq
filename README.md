@@ -13,7 +13,7 @@ farmit, wedge1b1, wedge1b1L,
 select ROPs to render, hit the button for farmit on the shelf to farm the ROPS,
 it will: 
  * save your hipfile!
- * copy your hipfile with a jobID as its name (clean these up yourself if its annoying)
+ * copy your hipfile for the farm to use, with a jobID as its name
  * rsync your $HFS to farm/hfs sos the slaves can run daily-builds too
  * piece together commands to process your stuff
  * create the commands in farm/pending
