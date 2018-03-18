@@ -1,4 +1,4 @@
-# batch command generator by c.p.brown, 2018
+# batch command generator by c.p.brown, 2017
 # for encapsulated native projects
 # hbatch only (I'm using Indie)
 # linux only
@@ -79,6 +79,7 @@ if len(ops) >= 1 :
     
     for i in ops :
         isasim = 1
+        fto = ''
         batchcmd = ""
         otn = i.type().name()
         if otn == 'rop_geometry' or otn == 'rop_dop' or otn == 'geometry' or otn == 'wedge' or otn == 'rop_comp' or otn == 'comp' or otn == 'ifd':
@@ -86,6 +87,14 @@ if len(ops) >= 1 :
             opth = i.path()
             print("selected rop " + opn + " is type " + otn)
             
+# does it have a host filter? set paths to use it
+
+            try :
+                fto = i.parm('farmitto').eval() + '/'
+            except :
+                fto = ''
+            if fto == '/' : fto = ''
+
 # its a wedge
 
             if otn == 'wedge' :
@@ -125,11 +134,7 @@ if len(ops) >= 1 :
                     wisasim = wd.parm('initsim').eval()
                 except:
                     wisasim = 0
- 
-# set wedge range to single_wedge
-                    
-                i.parm('wrange').set(1)
-                
+                                    
 # get string vars from the wedge driver                
                 
                 wpth = wd.path()
@@ -149,47 +154,47 @@ if len(ops) >= 1 :
                 oldcc = 0
                 cc = int(fstart)
                 for n in range(int(fdur)) :
-                    
+                                    
+# set wedge range to single_wedge
+                
+                    i.parm('wrange').set(1)
+                
 # set wedge number:
-
+                
                     i.parm('wedgenum').set(cc)
-
-# is it a sim?
- 
-                    if not wisasim :
-
-                        print("\t\twedge_" + str(cc) + " is not a sim, sending per-frame commands...")    
-                    
+                
 # set per-wedge overrides, since setting wedgenum doesn't work we're just bypassing wedge altogether for non-sims:
 
-                        ch = i.parm('chan1').eval()
-                        oldcc = hou.parm(ch).eval()
-                        hou.parm(ch).set(cc)
-                        print("\t\t\tset channel " + ch + " to value: " + str(cc)) 
-                        
+                    ch = i.parm('chan1').eval()
+                    oldcc = hou.parm(ch).eval()
+                    hou.parm(ch).set(cc)
+                    print("\t\t\tset channel " + ch + " to value: " + str(cc)) 
+                    
 # set wedge driver output manually as setting wedgenum doesn't work                
-                
-                        if wtn == 'ifd' : wd.parm('vm_picture').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F4.pic")
-                        if wtn == 'geometry' : wd.parm('sopoutput').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F.bgeo.sc")
-                        if wtn == 'rop_geometry' : wd.parm('sopoutput').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F.bgeo.sc")
-                        if wtn == 'comp' : wd.parm('copoutput').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F4." + ext)
-                        if wtn == 'rop_comp' : wd.parm('copoutput').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F4." + ext)
-                        if wtn == 'ifd' : print('\t\t\tchecking matra ROP filename: ' + wd.parm('vm_picture').eval())
-                        
+            
+                    if wtn == 'ifd' : wd.parm('vm_picture').set("$HIP/ifd/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F4.pic")
+                    if wtn == 'geometry' : wd.parm('sopoutput').set("$HIP/tmp/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F.bgeo.sc")
+                    if wtn == 'rop_geometry' : wd.parm('sopoutput').set("$HIP/tmp/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F.bgeo.sc")
+                    if wtn == 'comp' : wd.parm('copoutput').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F4." + ext)
+                    if wtn == 'rop_comp' : wd.parm('copoutput').set("$HIP/pic/${OS}_" + str(cc) + "/${OS}_" + str(cc) + ".$F4." + ext)
+                    if wtn == 'ifd' : print('\t\t\tchecking matra ROP filename: ' + wd.parm('vm_picture').eval())
+                    
 # save per-wedge hipfile:         
 
-                        hou.hipFile.save()
-                        whup = os.path.dirname(hou.hipFile.name()) + '/' + 'delme_' + nx + '_wedge_' + str(cc) + '.hip'
-                        wcpycmd = "cp " + hou.hipFile.name() + " " + whup
-                        os.system(wcpycmd)
-                        print("\t\t\tsaved temp hipfile: " + whup)
-                        
+                    hou.hipFile.save()
+                    whup = os.path.dirname(hou.hipFile.name()) + '/' + 'delme_' + nx + '_wedge_' + str(cc) + '.hip'
+                    wcpycmd = "cp " + hou.hipFile.name() + " " + whup
+                    os.system(wcpycmd)
+                    print("\t\t\tsaved temp hipfile: " + whup)
+                    
 # get possible packet sizes, for future optimization for COPs
 
-                        print("\t\t\tpacket sizes = " + str(factors(int(sfdur))))
+                    print("\t\t\tpacket sizes = " + str(factors(int(sfdur))))
 
 # create batch scripts per frame for non-sims:
-     
+
+                    if not wisasim :
+                        print("\t\t\twedge_" + str(cc) + " is not a sim, sending per-frame commands...")   
                         scc = int(sfstart)
                         for s in range(int(sfdur)) :
                             pcc = prepadstr(str(scc), "0", len(sfdur)) 
@@ -197,43 +202,47 @@ if len(ops) >= 1 :
                             if batchcmd != "" :
                                 nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
                                 #print(batchcmd)
-                                bsh = (hprj + '/farm/pending/' + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + wpn + '_' + opn + '_wedge' + str(cc) + '.sh')
+                                bsh = (hprj + '/farm/pending/' + fto + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + wpn + '_' + opn + '_wedge' + str(cc) + '.sh')
+                                #print(bsh)
                                 if not os.path.exists(os.path.dirname(bsh)):
                                     os.makedirs(os.path.dirname(bsh))
                                 f = open(bsh,'w')
                                 f.write(batchcmd + '\n')
                                 f.close()
                             scc = scc + 1
+                    else:
+                    
+# driver is a sim, send one job per wedge only:                    
+                        print("\t\t\tis a sim, sending one job per wedge")
+                        batchcmd = nethfs + "/bin/hbatch -c \"render -V " + wpth + "\" -c  \"quit\" " +  whup
+                        if batchcmd != "" :
+                            nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
+                            print("\t\t\t" + batchcmd)
+                            bsh = (hprj + '/farm/pending/' + fto + nn + '_' + hdir + '_' + hj + '_' + hname + '_' + wpn + '_' + opn + '_wedge' + str(cc) + '.sh')
+                            print("\t\t\t" + bsh)
+                            if not os.path.exists(os.path.dirname(bsh)):
+                                os.makedirs(os.path.dirname(bsh))
+                            f = open(bsh,'w')
+                            f.write(batchcmd + '\n')
+                            f.close()                
+                    
 
 # reset wedged channel value
 
                         hou.parm(ch).set(oldcc)
+                        
+# reset wedge range mode
+
+                        i.parm('wrange').set(0)
 
 # reset the wedge driver file fields to my defaults
                     
-                        if wtn == 'ifd' : wd.parm('vm_picture').set("$HIP/pic/${OS}/${OS}.$F4.pic")
-                        if wtn == 'geometry' : wd.parm('sopoutput').set("$HIP/pic/${OS}/${OS}.$F.bgeo.sc")
-                        if wtn == 'rop_geometry' : wd.parm('sopoutput').set("$HIP/pic/${OS}/${OS}.$F.bgeo.sc")
+                        if wtn == 'ifd' : wd.parm('vm_picture').set("$HIP/ifd/${OS}/${OS}.$F4.pic")
+                        if wtn == 'geometry' : wd.parm('sopoutput').set("$HIP/tmp/${OS}/${OS}.$F.bgeo.sc")
+                        if wtn == 'rop_geometry' : wd.parm('sopoutput').set("$HIP/tmp/${OS}/${OS}.$F.bgeo.sc")
                         if wtn == 'comp' : wd.parm('copoutput').set("$HIP/pic/${OS}/${OS}.$F4." + ext)
                         if wtn == 'rop_comp' : wd.parm('copoutput').set("$HIP/pic/${OS}/${OS}.$F4." + ext)
-                        print("\t\tper-frame commands sent")
-                        
-# create batch scripts for sims, no need to save hipfile per wedge as we're using the wedge ROP                           
-                            
-                    else:
-                        print("wedge_" + str(cc) + " is a sim, sending as one command...")
-                        for s in range(int(sfdur)) :
-                            batchcmd = nethfs + "/bin/hbatch -c \"render -V " + wpth + "\" -c  \"quit\" " +  hup      
-                            if batchcmd != "" :
-                                nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
-                                #print(batchcmd)
-                                bsh = (hprj + '/farm/pending/' + nn + '_' + hdir + '_' + hj + '_' + hname + '_' + wpn + '_' + opn + '_wedge' + str(cc) + '.sh')
-                                if not os.path.exists(os.path.dirname(bsh)):
-                                    os.makedirs(os.path.dirname(bsh))
-                                f = open(bsh,'w')
-                                f.write(batchcmd + '\n')
-                                f.close()
-                                
+                                                        
 # next wedge                                
                                 
                     cc = cc + 1
@@ -267,7 +276,7 @@ if len(ops) >= 1 :
                 print("is a sim: " + str(isasim))
                 if not isasim :
                     
-                    if otn == 'comp' or 'rop_comp' :
+                    if otn == 'comp' or otn == 'rop_comp' :
                     
 # do 10s for COPs, change dv to desired frames-per-job                  
                     
@@ -288,7 +297,7 @@ if len(ops) >= 1 :
                             #print('\tcmd = ' + batchcmd)
                             if batchcmd != "" :
                                 nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
-                                bsh = (hprj + '/farm/pending/' + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
+                                bsh = (hprj + '/farm/pending/' + fto + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
                                 if not os.path.exists(os.path.dirname(bsh)):
                                     os.makedirs(os.path.dirname(bsh))
                                 f = open(bsh,'w')
@@ -304,7 +313,7 @@ if len(ops) >= 1 :
                             #print('\tcmd = ' + batchcmd)
                             if batchcmd != "" :
                                 nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
-                                bsh = (hprj + '/farm/pending/' + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
+                                bsh = (hprj + '/farm/pending/' + fto + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
                                 if not os.path.exists(os.path.dirname(bsh)):
                                     os.makedirs(os.path.dirname(bsh))
                                 f = open(bsh,'w')
@@ -317,7 +326,7 @@ if len(ops) >= 1 :
                             batchcmd = nethfs + "/bin/hbatch -c \"render -V -f" + str(cc) + " " + str(cc) + " " + opth + "\" -c  \"quit\" " +  hup
                             if batchcmd != "" :
                                 nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
-                                bsh = (hprj + '/farm/pending/' + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
+                                bsh = (hprj + '/farm/pending/' + fto + nn + '_' + pcc + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
                                 if not os.path.exists(os.path.dirname(bsh)):
                                     os.makedirs(os.path.dirname(bsh))
                                 f = open(bsh,'w')
@@ -332,7 +341,7 @@ if len(ops) >= 1 :
                     if batchcmd != "" :
                         nn = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S')
                         #print(batchcmd)
-                        bsh = (hprj + '/farm/pending/' + nn + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
+                        bsh = (hprj + '/farm/pending/' + fto + nn + '_' + hdir + '_' + hj + '_' + hname + '_' + opn + '.sh')
                         if not os.path.exists(os.path.dirname(bsh)):
                             os.makedirs(os.path.dirname(bsh))
                         f = open(bsh,'w')
