@@ -2,25 +2,24 @@
 simple Q
 
 ```
-Make a dir called farm in the project dir - one level up from $HIP,
-add subdirs: pending, running, done and hfs,
-copy themo.sh into it,
-run themo.sh on all slaves.
-
-Open Houdini,
-copy contents of houdini scripts into respective shelf tools: 
-farmit, wedge1b1, wedge1b1L,
-select ROPs to render, hit the button for farmit on the shelf to farm the ROPS,
-it will: 
- * save your hipfile!
- * copy your hipfile for the farm to use, with a jobID as its name
- * rsync your $HFS to farm/hfs sos the slaves can run daily-builds too
- * piece together commands to process your stuff
- * create the commands in farm/pending
-
-For wedge1by1local, make a farm on the desktop.
-
-Tested OK on linux using computers networked with sshfs, just don't use the server for anything else.
+batch command generator by c.p.brown, 2018
+for encapsulated native projects
+hbatch only (I'm using Indie)
+linux only
+...
+assumes farm is in /farm TWO levels up from hip dir:
+     /path/to/project/shot/task/hip.hip
+     /path/to/project/farm/
+     /path/to/project/farm/pending/
+     /path/to/project/farm/running/
+     /path/to/project/farm/done/
+     /path/to/project/farm/themo.sh
+ ...
+ wedge is a messy bypass hack, hence the code bloat
+ only mantra, geo and cop wedging will work atm
+ wedge is farmed per frame, per wedge, unless its a sim
+ adding int params 'wubs' and 'wube' to wedge will allow range override
+ eg: render 5 to 8 of a 10-wedge setup
 
 Doesn't do pause, resume, daisychaining, priorities or any other fancy things... 
 just executes a directory full of commands. While you sleep.
