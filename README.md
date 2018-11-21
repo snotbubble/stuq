@@ -20,8 +20,9 @@ Assumes farm is in /farm TWO levels up from hip dir:
      
 Usage:
  1. copy cpb_farmit.py to a new shelftool
- 2. select some ROPs
- 3. hit the button...
+ 2. change 'myfaveterm' to whatever your distro uses, then accept
+ 3. select some ROPs
+ 4. hit the button...
 
 
  
