@@ -29,6 +29,11 @@ usr = getpass.getuser()
 pathtohoudini = "/opt/hfs" + hou.applicationVersionString()
 ops = hou.selectedNodes()
 
+# change this to whatever is default on your distro
+# don't use xterm as it locks-up houdini
+
+myfaveterm = "xfce4-terminal"
+
 # leading zeroes
 
 def prepadstr(instr, pad, padlen) :
@@ -39,14 +44,6 @@ def prepadstr(instr, pad, padlen) :
 		o = o + instr
 		#print(o)
 		return(o)
-
-# very slick get-factors function copied from stackexchange        
-		
-def factors(n):
-	step = 2 if n%2 else 1
-	return set(reduce(list.__add__,
-		([i, n/i] for i in range(1, int(sqrt(n))+1, step) if n % i == 0)))
-
 		
 		
 if len(ops) >= 1 :
@@ -62,6 +59,85 @@ if len(ops) >= 1 :
 	
 	print("\nthis project is : " + hprj)
 
+# setup the farm
+
+	pendingdir = hprj + "/farm/pending"
+	runningdir = hprj + "/farm/running"
+	donedir = hprj + "/farm/done"
+	themofile = hprj + "/farm/themo.sh"
+
+	if not os.path.exists(pendingdir): os.makedirs(pendingdir)
+	if not os.path.exists(runningdir): os.makedirs(runningdir)
+	if not os.path.exists(donedir): os.makedirs(donedir)
+	
+	if not os.path.exists(themofile) :
+		themoscript = """#!/bin/sh
+while true
+do
+	iam=`hostname -s`
+	loc=`ls -1 ./pending/$iam/*.sh 2>/dev/null | wc -l`
+	if [ $loc != 0 ]; then
+		for file in ./pending/$iam/*.sh
+			do
+				if [ -f $file ]; then
+					chmod u+x $file
+					src=$(readlink --canonicalize $file)
+					fnm=$(basename $src)
+					mkdir ./running/$iam/
+					mv $src ./running/$iam/$fnm
+					/bin/bash ./running/$iam/$fnm
+					mv ./running/$iam/$fnm ./done/$fnm
+					break
+				fi
+		done
+	else
+		for file in ./pending/*.sh
+			do
+				if [ -f $file ]; then
+					chmod u+x $file
+					src=$(readlink --canonicalize $file)
+					fnm=$(basename $src)
+					mkdir ./running/$iam/
+					mv $src ./running/$iam/$fnm
+					/bin/bash ./running/$iam/$fnm
+					mv ./running/$iam/$fnm ./done/$fnm
+					break
+				fi
+			done
+	fi
+	file=0
+	src=0
+	fnm=0
+	loc=0
+	sleep 2
+done
+"""
+		#print("themo.sh doesn't exist, writing it...\n" + themoscript + "\n")
+		
+# themo.sh doesn't exist...     
+
+		f = open(themofile,"w")
+		print("themo.sh doesn't exist, writing it...\n")
+		for line in themoscript.splitlines():
+			f.write(line + "\n")
+		f.close()
+
+# chmod themo.sh
+		
+		mode = os.stat(themofile).st_mode
+		mode |= (mode & 0o444) >> 2 
+		os.chmod(themofile, mode)
+
+# run themo if not running already:
+		
+	import subprocess
+	try :
+		pid = subprocess.check_output(["pidof","-s", themofile])
+		print(str(pid))
+	except:
+		print("themo not running, starting it...")
+		os.system(myfaveterm + " -e 'bash -c \"cd " + hprj + "/farm/; ./themo.sh\"'")
+	
 # save the scene  
 
 	hup = os.path.dirname(hou.hipFile.name()) + '/' + 'delme_' + nx + '.hip'    
