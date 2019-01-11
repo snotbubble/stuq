@@ -301,10 +301,6 @@ done
                     wcpycmd = "cp " + hou.hipFile.name() + " " + whup
                     os.system(wcpycmd)
                     print("\t\t\tsaved temp hipfile: " + whup)
-                    
-# get possible packet sizes, for future optimization for COPs
-
-                    print("\t\t\tpacket sizes = " + str(factors(int(sfdur))))
 
 # create batch scripts per frame for non-sims:
 
