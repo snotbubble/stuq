@@ -53,7 +53,7 @@ if len(ops) >= 1 :
 	hname = hou.hipFile.path().split('.')[0].split('/')[-1].replace('_','-')
 	hdir = hou.hipFile.path().split('.')[0].split('/')[-3].replace('_','-')
 	hj = hou.hipFile.path().split('.')[0].split('/')[-2].replace('_','-')
-	hprj = "/".join(hou.hipFile.path().split('.')[0].split('/')[:-5])
+	hprj = "/".join(hou.hipFile.path().split('.')[0].split('/')[:-2])
 	nx = datetime.strftime(datetime.now(),'%y%m%d_%H%M%S%f')
 	
 	print("\nthis project is : " + hprj)
