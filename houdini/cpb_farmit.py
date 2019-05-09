@@ -373,7 +373,10 @@ done
 					try :
 						isasim = i.parm('initsim').eval()
 					except:
-						isasim = 0
+						try :
+							isasim = i.parm('soho_initsim').eval()
+						except:
+							isasim = 0
 						
 # create batch scripts per frame if not a sim
 						
@@ -467,6 +470,12 @@ done
 						f = open(bsh,'w')
 						f.write(batchcmd + '\n')
 						f.close()
+						
+# execute shell ROPs instantly                        
+						
+				if otn == 'shell':
+					i.parm('execute').pressButton()
+					
 		time.sleep(1)                        
 						
 # run themo if not running already:
