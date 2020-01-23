@@ -1,5 +1,5 @@
-# farmit
-simple Q
+# StuQ
+stupidly simple Q
 
 ```
 Batch command generator by c.p.brown, 2018
