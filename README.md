@@ -2,14 +2,14 @@
 stupidly simple Q
 
 ```
-Batch command generator by c.p.brown, 2018
+Batch command generator by c.p.brown, 2019
 for encapsulated native projects
 hbatch only (I'm using Indie)
 Linux only
 
 
 
-Assumes farm is in /farm TWO levels up from hip dir:
+Assumes farm is in /farm 2 levels up from hip dir:
      /path/to/project/shot/task/hip.hip
      /path/to/project/farm/
      /path/to/project/farm/pending/
@@ -19,7 +19,7 @@ Assumes farm is in /farm TWO levels up from hip dir:
 
      
 Usage:
- 1. copy cpb_farmit.py to a new shelftool
+ 1. copy cpb_stuq.py to a new shelftool
  2. change 'myfaveterm' to whatever your distro uses, then accept
  3. select some ROPs
  4. hit the button...
