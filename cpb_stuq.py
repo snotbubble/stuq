@@ -1,9 +1,9 @@
-# batch command generator by c.p.brown, 2018
+# batch command generator by c.p.brown, 2019
 # for encapsulated native projects
 # hbatch only (I'm using Indie)
 # linux only
 # ...
-# assumes farm is in /farm TWO levels up from hip dir:
+# assumes farm is in /farm 2 levels up from hip dir:
 #     /path/to/project/shot/task/hip.hip
 #     /path/to/project/farm/
 #     /path/to/project/farm/pending/
@@ -16,7 +16,7 @@
 # wedge is farmed per frame, per wedge, unless its a sim
 # adding int params 'wubs' and 'wube' to wedge will allow range override
 # eg: render 5 to 8 of a 10-wedge setup
-########################################################################
+
 
 import os
 import string
